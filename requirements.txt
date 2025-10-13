@@ -1,0 +1,21 @@
+# FastAPI Server 
+FastAPI==0.109.0
+uvicorn[standard]==0.23.2
+
+# Azure SDK 
+azure-search-documents==11.6.0
+ai-ai-openai==1.2.0
+azure-identity==1.16.0
+azure-storage-blob==12.17.0
+azure-keyvault-secrets==4.9.0
+
+# HTTP Requests / Async 
+httpx==1.2.3
+Requests==2.32.0
+
+# Datenhandhabung
+pandas==2.1.1
+numpy==1.26.0
+
+# Jupyter Notebook für Demo
+jupyterlab==4.2.2
