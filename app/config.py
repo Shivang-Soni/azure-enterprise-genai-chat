@@ -1,0 +1,6 @@
+import os 
+
+
+AZURE_SEARCH_ENDPOINT = os.getenv("AZURE_SEARCH_ENDPOINT", "")
+AZURE_SEARCH_KEY = os.getenv("AZURE_SEARCH_KEY", "")
+AZURE_SEARCH_INDEX = os.getenv("AZURE_SEARCH_INDEX", "")
