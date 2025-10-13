@@ -4,6 +4,7 @@ from azure.core.credentials import AzureKeyCredential
 from app.config import AZURE_OPENAI_ENDPOINT, AZURE_OPENAI_KEY
 import os
 
+
 class OpenAIClientWrapper:
     def __init__(self):
         self.client = OpenAIClient(
