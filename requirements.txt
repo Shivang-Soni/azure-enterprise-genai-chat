@@ -9,6 +9,9 @@ azure-identity==1.16.0
 azure-storage-blob==12.17.0
 azure-keyvault-secrets==4.9.0
 
+# OpenAI
+openai>=1.35.0
+
 # HTTP Requests / Async 
 httpx==1.2.3
 Requests==2.32.0
