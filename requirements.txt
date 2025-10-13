@@ -4,7 +4,7 @@ uvicorn[standard]==0.23.2
 
 # Azure SDK 
 azure-search-documents==11.6.0
-ai-ai-openai==1.2.0
+azure-ai-openai==1.2.0
 azure-identity==1.16.0
 azure-storage-blob==12.17.0
 azure-keyvault-secrets==4.9.0
