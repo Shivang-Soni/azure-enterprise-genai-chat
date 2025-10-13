@@ -1,12 +1,15 @@
+# app/config.py
 import os
 
+# Ermöglicht Zugang zu der Azure Key Vault
+AZURE_KEY_VAULT_URL = os.getenv("AZURE_KEY_VAULT_URL", "")
 
+# Voreinstellungen
 AZURE_SEARCH_ENDPOINT = os.getenv("AZURE_SEARCH_ENDPOINT", "")
 AZURE_SEARCH_KEY = os.getenv("AZURE_SEARCH_KEY", "")
 AZURE_SEARCH_INDEX = os.getenv("AZURE_SEARCH_INDEX", "")
 AZURE_OPENAI_ENDPOINT = os.getenv("AZURE_OPENAI_ENDPOINT", "")
 AZURE_OPENAI_KEY = os.getenv("AZURE_OPENAI_KEY", "")
-AZURE_KEY_VAULT_URL = os.getenv("AZURE_KEY_VAULT_URL", "")
 AZURE_BLOB_CONN_STR = os.getenv("AZURE_BLOB_CONN_STR", "")
 AZURE_BLOB_CONTAINER = os.getenv("AZURE_BLOB_CONTAINER", "")
 AZURE_OPENAI_DEPLOYMENT = os.getenv("AZURE_OPENAI_DEPLOYMENT", "")
