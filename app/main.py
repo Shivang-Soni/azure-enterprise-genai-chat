@@ -1,6 +1,8 @@
 import logging
+
 from fastapi import FastAPI
-from pydantic import BaseModel  
+from pydantic import BaseModel
+
 from app.clients.keyvault import AzureKeyVaultClient
 from app.services.chat_service import ChatService
 
@@ -38,3 +40,4 @@ def health():
 async def chat_endpoint(request: ChatRequest):
     answer = chat_service.process_query(request.question, request.user_id)
     return ChatResponse(answer=answer)
+

@@ -1,8 +1,9 @@
+import json
 import logging
+
+from app.clients.blob_storage import BlobStorageClient
 from app.clients.cognitive_search import CoginitiveSearchClient
 from app.clients.openai_client import OpenAIClientWrapper
-from app.clients.blob_storage import BlobStorageClient
-import json
 
 logger = logging.getLogger(__name__)
 
@@ -11,7 +12,7 @@ class ChatService:
     def __init__(self):
         self.search_client = CoginitiveSearchClient()
         self.openai_client = OpenAIClientWrapper()
-        self.blob_storage = BlobStorageClient() 
+        self.blob_storage = BlobStorageClient()
 
     def process_query(self, question: str, user_id: str = "default_user"):
         """
@@ -24,7 +25,7 @@ class ChatService:
         context_texts = [doc.get("content", "") for doc in documents]
         context_combined = "\n".join(context_texts)
 
-        # Prompt für OpenAI vorbereiten 
+        # Prompt für OpenAI vorbereiten
         prompt = f"""
         Du bist ein KL Assistent.
         Nutze die folgenden Dokumente als Kontext, um präzise und professionelle Antworten zu geben, ausschließlich aufs Deutsch.
@@ -38,13 +39,12 @@ class ChatService:
 
         # Antwort erzeugen
         answer = self.openai_client.generate_answer(prompt)
-        
+
         # Verlauf speichern
-        self._save_conversation(user_id, {
-            "user_query": question,
-            "answer": answer,
-            "context_used": context_texts
-        })
+        self._save_conversation(
+            user_id,
+            {"user_query": question, "answer": answer, "context_used": context_texts},
+        )
 
         # Antwort zurückgeben
         return answer
@@ -56,5 +56,3 @@ class ChatService:
         filename = f"chat_history/{user_id}.json"
         self.blob_storage.upload_text(filename, json.dumps(data, ensure_ascii=False))
         logger.info(f"Gespräch wurde für {user_id} erfolgreich gespeichert.")
-
-        
