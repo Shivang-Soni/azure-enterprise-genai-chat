@@ -1,4 +1,3 @@
-import logging
 import os
 
 from typing import Optional
@@ -7,11 +6,7 @@ from azure.keyvault.secrets import SecretClient
 
 from app.config import AZURE_KEY_VAULT_URL
 
-# ============================================
-# Logging Konfiguration
-# ============================================
-logging.basicConfig(logging.INFO)
-
+]
 
 class AzureKeyVaultClient:
     """
@@ -37,6 +32,5 @@ class AzureKeyVaultClient:
         try:
             secret = self.client.get_secret(secret_name)
             return secret.value
-        except Exception as e:
-            logging.error(f"Fehler beim Aufruf vom Geheimnis: {secret_name}")
-            return None
+        except Exception:
+            return os.getenv(secret_name, "")
