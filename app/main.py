@@ -40,4 +40,3 @@ def health():
 async def chat_endpoint(request: ChatRequest):
     answer = chat_service.process_query(request.question, request.user_id)
     return ChatResponse(answer=answer)
-

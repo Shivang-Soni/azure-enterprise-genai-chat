@@ -1,6 +1,7 @@
 import logging
 import os
 
+from typing import Optional
 from azure.identity import DefaultAzureCredential
 from azure.keyvault.secrets import SecretClient
 
@@ -37,5 +38,5 @@ class AzureKeyVaultClient:
             secret = self.client.get_secret(secret_name)
             return secret.value
         except Exception as e:
-            logging.error("Fehler beim Aufruf vom Geheimnis: {secret_name}")
+            logging.error(f"Fehler beim Aufruf vom Geheimnis: {secret_name}")
             return None
