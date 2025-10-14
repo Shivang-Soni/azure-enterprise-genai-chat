@@ -22,3 +22,8 @@ numpy==1.26.0
 
 # Jupyter Notebook für Demo
 jupyterlab==4.2.2
+
+# PEP-8 Konform zu halten
+flake8
+black
+isort
