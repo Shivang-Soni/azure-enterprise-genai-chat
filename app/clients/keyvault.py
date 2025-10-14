@@ -6,7 +6,6 @@ from azure.keyvault.secrets import SecretClient
 
 from app.config import AZURE_KEY_VAULT_URL
 
-]
 
 class AzureKeyVaultClient:
     """
