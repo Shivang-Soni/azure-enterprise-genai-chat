@@ -4,26 +4,27 @@ uvicorn[standard]==0.23.2
 
 # Azure SDK 
 azure-search-documents==11.6.0
-azure-ai-openai==1.2.0
-azure-identity==1.16.0
-azure-storage-blob==12.17.0
+#azure-ai-openai>=1.3.0,<2.0.0 # auskommentiert wegen fehlender universellen Archtitekturkompatibilität
+azure-identity==1.12.0
+azure-storage-blob==12.22.0
 azure-keyvault-secrets==4.9.0
 
 # OpenAI
 openai>=1.35.0
 
 # HTTP Requests / Async 
-httpx==1.2.3
-Requests==2.32.0
+httpx>=0.23.0, <1.29.0
+requests==2.32.0
 
 # Datenhandhabung
 pandas==2.1.1
 numpy==1.26.0
+python-dotenv>=1.0.0
 
 # Jupyter Notebook für Demo
 jupyterlab==4.2.2
 
-# PEP-8 Konform zu halten
-flake8
-black
-isort
+# Emfehlenswert: PEP-8 Konform zu halten
+# flake8
+# black
+# isort
