@@ -1,9 +1,9 @@
 import logging
 from typing import List
 
-from azure.storage.blob import BlobServiceClient
+from azure.storage.blob import ContainerClient
 
-from app.config import AZURE_BLOB_CONN_STR, AZURE_BLOB_CONTAINER
+from app.config import AZURE_BLOB_CONN_STR
 
 # Initialiserung vom Logger
 logger = logging.getLogger(__name__)
@@ -19,15 +19,17 @@ class BlobStorageClient:
         Initialisiert die Verbindung zu Azure Blob Storage
         """
         try:
-            self.blob_service_client = BlobServiceClient.from_connection_string(
-                AZURE_BLOB_CONN_STR
+            # ContainerClient wird unmittelbar mit SAS URL erstellt.
+            self.container_client = ContainerClient.from_container_url(
+                container_url=f"{AZURE_BLOB_CONN_STR}"
             )
-            self.container_client = self.blob_service_client.get_container_client(
-                AZURE_BLOB_CONTAINER
-            )
-            logger.info("Azure Blob Storage Client wurde erfolgreich initialisiert")
+            logger.info(
+                "Azure Blob Storage Client wurde erfolgreich initialisiert"
+                )
         except Exception as e:
-            logger.error(f"Fehler bei der Initialisierung von BlobStorageClient: {e}")
+            logger.error(
+                f"Fehler bei der Initialisierung von BlobStorageClient: {e}"
+                )
             raise
 
     def upload_file(self, file_path: str, blob_name: str) -> bool:
@@ -36,9 +38,8 @@ class BlobStorageClient:
         """
         try:
             with open(file_path, "rb") as data:
-                self.container_client.upload_blob(
-                    name=blob_name, data=data, overwrite=True
-                )
+                blob_client = self.container_client.get_blob_client(blob_name)
+                blob_client.upload_blob(data, overwrite=True)
             logger.info(f"Datei: {blob_name} erfolgreich geladen.")
             return True
         except Exception as e:
@@ -50,9 +51,9 @@ class BlobStorageClient:
         Lädt eine Datei aus dem Blob-Container herunter.
         """
         try:
+            blob_client = self.container_client.get_blob_client(blob_name)
             with open(download_path, "wb") as file:
-                stream = self.container_client.download_blob(blob_name)
-                file.write(stream.readall())
+                file.write(blob_client.download_blob().readall())
             logger.info("Datei: {blob_name} erfolgreich heruntergeladen.")
             return True
         except Exception as e:
