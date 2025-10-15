@@ -1,7 +1,7 @@
 import logging
 
 from azure.core.credentials import AzureKeyCredential
-from azure.core.exception import HttpResponseError
+from azure.core.exceptions import HttpResponseError
 from azure.search.documents import SearchClient
 
 from app.config import AZURE_SEARCH_ENDPOINT, AZURE_SEARCH_INDEX, AZURE_SEARCH_KEY
