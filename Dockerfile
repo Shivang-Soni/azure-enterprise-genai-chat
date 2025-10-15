@@ -14,9 +14,6 @@ RUN pip install -r requirements.txt
 # App code wird kopiert
 COPY . .
 
-# .env Datei:
-ENV $(cat .env | xargs)
-
 # Portfreigabe
 EXPOSE 8000
 
