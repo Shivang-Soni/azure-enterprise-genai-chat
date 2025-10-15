@@ -20,7 +20,7 @@ class CoginitiveSearchClient:
         try:
             self.client = SearchClient(
                 endpoint=AZURE_SEARCH_ENDPOINT,
-                index=AZURE_SEARCH_INDEX,
+                index_name=AZURE_SEARCH_INDEX,
                 credential=AzureKeyCredential(AZURE_SEARCH_KEY),
             )
         except Exception as e:

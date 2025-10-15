@@ -11,7 +11,8 @@ logger = logging.getLogger(__name__)
 
 class BlobStorageClient:
     """
-    Verwaltet Uploads, Downloads, und Auflistungen von Dateien in Azure Blob Storage.
+    Verwaltet Uploads, Downloads, und Auflistungen 
+    von Dateien in Azure Blob Storage.
     """
 
     def __init__(self):
