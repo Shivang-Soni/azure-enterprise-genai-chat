@@ -35,7 +35,10 @@ class CoginitiveSearchClient:
         Gibt die Top-Dokumente als Liste von Dictionaries zurück.
         """
         try:
-            results = self.client.search(search_text=query, top=top)
+            results = self.client.search(
+                search_text=query, 
+                top=top
+                )
             return [doc for doc in results]
         except HttpResponseError as e:
             logger.error(f"Fehler bei der Suchanfrage: {e}")

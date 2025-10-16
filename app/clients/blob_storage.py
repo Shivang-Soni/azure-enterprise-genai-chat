@@ -55,7 +55,7 @@ class BlobStorageClient:
             blob_client = self.container_client.get_blob_client(blob_name)
             with open(download_path, "wb") as file:
                 file.write(blob_client.download_blob().readall())
-            logger.info("Datei: {blob_name} erfolgreich heruntergeladen.")
+            logger.info(f"Datei: {blob_name} erfolgreich heruntergeladen.")
             return True
         except Exception as e:
             logger.error(f"Fehler beim Herunterladen von '{blob_name}': {e}")
@@ -68,5 +68,5 @@ class BlobStorageClient:
         try:
             return [blob.name for blob in self.container_client.list_blobs()]
         except Exception as e:
-            logger.error("Fehler beim Auflisten von Dateien: {e}")
+            logger.error(f"Fehler beim Auflisten von Dateien: {e}")
             return []
