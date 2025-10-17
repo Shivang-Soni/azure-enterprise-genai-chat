@@ -52,19 +52,18 @@ class BlobStorageClient:
                 )
             return False
 
-    def download_file(self, blob_name: str, download_path: str) -> bool:
+    def download_file(self, blob_name: str, download_path: str) -> bytes:
         """
         Lädt eine Datei aus dem Blob-Container herunter.
         """
         try:
             blob_client = self.container_client.get_blob_client(blob_name)
-            with open(download_path, "wb") as file:
-                file.write(blob_client.download_blob().readall())
+            data = blob_client.download_blob().readall()
             logger.info(f"Datei: {blob_name} erfolgreich heruntergeladen.")
-            return True
+            return data
         except Exception as e:
             logger.error(f"Fehler beim Herunterladen von '{blob_name}': {e}")
-            return False
+            return None
 
     def list_files(self):
         """
