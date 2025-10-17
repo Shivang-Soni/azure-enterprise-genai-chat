@@ -15,7 +15,7 @@ credential = DefaultAzureCredential()
 secret_client = SecretClient(AZURE_KEY_VAULT_URL, credential=credential)
 
 
-def get_secret(name: str, fallback: str = "") -> str:
+def get_secret(name: str, fallback: str = "") -> str | None:
     """
     Versucht es, das genannte Geheimnis aus dem Vault zu holen.
     Falls es nicht vorhanden oder zugänglich ist,
