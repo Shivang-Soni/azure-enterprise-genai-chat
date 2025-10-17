@@ -27,10 +27,10 @@ export default function ChatBot() {
       const res = await fetch(API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: input }),
+        body: JSON.stringify({ user_id: "anon", question: input }), // angepasst
       });
       const data = await res.json();
-      setMessages([...newMessages, { sender: "bot", text: data.reply }]);
+      setMessages([...newMessages, { sender: "bot", text: data.answer }]); // angepasst
     } catch (err) {
       setMessages([...newMessages, { sender: "bot", text: "Fehler beim Senden." }]);
     } finally {
@@ -70,7 +70,7 @@ export default function ChatBot() {
           className="bg-blue-500 text-white p-2 rounded-r hover:bg-blue-600 disabled:opacity-50"
           disabled={loading}
         >
-          Senden
+          Abschicken
         </button>
       </div>
     </div>
