@@ -1,4 +1,3 @@
-import json
 import logging
 
 from app.clients.blob_storage import BlobStorageClient
@@ -53,6 +52,5 @@ class ChatService:
         """
         Speichert das Gespräch im Blob Speicher als JSON Datei.
         """
-        filename = f"chat_history/{user_id}.json"
-        self.blob_storage.upload_text(filename, json.dumps(data, ensure_ascii=False))
+        self.blob_storage.upload_file(data=data)
         logger.info(f"Gespräch wurde für {user_id} erfolgreich gespeichert.")

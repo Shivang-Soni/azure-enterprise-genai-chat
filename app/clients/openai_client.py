@@ -29,10 +29,12 @@ class OpenAIClientWrapper:
         context_text = ""
         
         if context_docs is not None:
-            context_text = "\n".join([f"- {doc['content']}" for doc in context_docs])
+            context_text = "\n".join(
+                [f"- {doc['content']}" for doc in context_docs]
+                )
             prompt = (
-                f"\n{context_text}\nAnhand dieser Dokumente beantworte die Frage:"
-                f"\nFrage: {prompt}"
+                f"\n{context_text}\nAnhand dieser Dokumente "
+                f"beantworte die Frage: \nFrage: {prompt}"
             )
         
         response = self.client.chat.completions.create(

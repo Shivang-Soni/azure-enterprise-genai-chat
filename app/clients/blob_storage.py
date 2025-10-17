@@ -1,9 +1,11 @@
 import logging
 from typing import List
 
+import json
+
 from azure.storage.blob import ContainerClient
 
-from app.config import AZURE_BLOB_CONN_STR
+from app.config import AZURE_BLOB_CONN_STR, AZURE_BLOB_CONTAINER
 
 # Initialiserung vom Logger
 logger = logging.getLogger(__name__)
@@ -33,18 +35,21 @@ class BlobStorageClient:
                 )
             raise
 
-    def upload_file(self, file_path: str, blob_name: str) -> bool:
+    def upload_file(self, data: dict) -> bool:
         """
         Lädt eine lokale Datei in den Blob Speicher hoch.
         """
         try:
-            with open(file_path, "rb") as data:
-                blob_client = self.container_client.get_blob_client(blob_name)
-                blob_client.upload_blob(data, overwrite=True)
-            logger.info(f"Datei: {blob_name} erfolgreich geladen.")
+            blob_client = self.container_client.get_blob_client(
+                AZURE_BLOB_CONTAINER
+                )
+            blob_client.upload_blob(json.dumps(data, ensure_ascii=False), overwrite=True)
+            logger.info(f"Datei: {AZURE_BLOB_CONTAINER} erfolgreich geladen.")
             return True
         except Exception as e:
-            logger.error(f"Fehler beim Hochladen der Datei {blob_name}: {e}")
+            logger.error(
+                f"Fehler beim Hochladen der Datei {AZURE_BLOB_CONTAINER}: {e}"
+                )
             return False
 
     def download_file(self, blob_name: str, download_path: str) -> bool:
