@@ -22,6 +22,7 @@ def get_secret(name: str, fallback: str = "") -> str | None:
     wird der in der .env vorhandenen Wert eingesetzt.
     """
     try:
+        name = name.lower().replace("_", "-")
         return secret_client.get_secret(name).value
     except Exception:
         logger.warning(
