@@ -24,12 +24,14 @@ export default function ChatBot() {
     setLoading(true);
 
     try {
+      console.log("Anfrage wird an URL geschickt: ", API_URL)
       const res = await fetch(API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ user_id: "user1", question: input }),
       });
       const data = await res.json();
+      console.log("Antwort bekommen.", data)
       setMessages((prev) => [...prev, { sender: "bot", text: data.answer }]);
     } catch (err) {
       setMessages((prev) => [...prev, { sender: "bot", text: "Fehler beim Senden." }]);
