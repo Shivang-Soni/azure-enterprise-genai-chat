@@ -1,12 +1,20 @@
 import logging
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from app.clients.keyvault import AzureKeyVaultClient
 from app.services.chat_service import ChatService
 
 app = FastAPI(title="Azure Enterprise GenAI Chat")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+    )
 
 # Key Vault und Chat Service
 key_vault_client = AzureKeyVaultClient()
