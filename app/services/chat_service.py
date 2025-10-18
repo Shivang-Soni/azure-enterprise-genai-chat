@@ -27,9 +27,13 @@ class ChatService:
         # Prompt für OpenAI vorbereiten
         prompt = f"""
         Du bist ein KL Assistent.
-        Nutze die folgenden Dokumente als Kontext, um präzise und professionelle Antworten zu geben, ausschließlich aufs Deutsch.
+        Nutze die folgenden Dokumente als Kontext,
+        um präzise und professionelle Antworten zu geben,
+        ausschließlich aufs Deutsch.
+        (Falls keine Dokumente als Kontext vorhanden sind,
+        gemäß Ihrem Wissen beantworten.)
         
-        Kontext: 
+        Kontext:
         {context_combined}
 
         Frage:
@@ -52,5 +56,5 @@ class ChatService:
         """
         Speichert das Gespräch im Blob Speicher als JSON Datei.
         """
-        self.blob_storage.upload_file(data=data)
+        self.blob_storage.upload_file(data=data, blob_name=None)
         logger.info(f"Gespräch wurde für {user_id} erfolgreich gespeichert.")
