@@ -5,7 +5,8 @@ from typing import List, Optional
 
 from azure.storage.blob import ContainerClient
 
-from app.config import AZURE_BLOB_CONN_STR, AZURE_BLOB_CONTAINER
+from app.config import AZURE_BLOB_SAS_TOKEN, \
+    AZURE_BLOB_ACCOUNT, AZURE_BLOB_CONTAINER
 
 # Initialiserung vom Logger
 logger = logging.getLogger(__name__)
@@ -24,9 +25,11 @@ class BlobStorageClient:
         """
         try:
             # ContainerClient wird unmittelbar mit SAS URL erstellt.
-            self.container_client = ContainerClient.from_container_url(
-                container_url=f"{AZURE_BLOB_CONN_STR}"
-            )
+            self.container_client = ContainerClient(
+                account_url = f"https://{AZURE_BLOB_ACCOUNT}.blob.core.windows.net",
+                container_name=AZURE_BLOB_CONTAINER,
+                credential=AZURE_BLOB_SAS_TOKEN
+                )
             logger.info(
                 "Azure Blob Storage Client wurde erfolgreich initialisiert"
                 )
@@ -36,7 +39,7 @@ class BlobStorageClient:
                 )
             raise
 
-    def upload_file(self, data: dict, blob_name: str) -> bool:
+    def upload_file(self, data: dict, blob_name: Optional[str]) -> bool:
         """
         Lädt eine lokale Datei in den Blob Speicher hoch.
         """
