@@ -13,7 +13,7 @@ export default function ChatBot() {
   useEffect(scrollToBottom, [messages]);
 
   const API_URL =
-    process.env.REACT_APP_API_URL || "http://localhost:8000/api/chat";
+    process.env.REACT_APP_API_URL || "http://azure-enterprise-genai-chat-solution.germanywestcentral.azurecontainer.io:8000/api/chat";
 
   const sendMessage = async () => {
     if (!input.trim()) return;
