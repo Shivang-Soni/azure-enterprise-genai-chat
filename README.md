@@ -146,4 +146,4 @@ docker run -p 8000:8000 azure-genai-chat
 * Logging, Monitoring und RBAC für Enterprise-ready Betrieb vorbereitet
 
 ```
-```
+
