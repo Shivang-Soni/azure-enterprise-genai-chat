@@ -9,3 +9,7 @@ venv
 .gitignore
 *.json
 *.pfx
+*.cer
+*.pem
+*.crt
+*.key
