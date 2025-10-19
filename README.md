@@ -1,4 +1,3 @@
-```markdown
 # Azure Enterprise GenAI Chat
 
 **Enterprise-fähiger KI-Chatbot mit FastAPI und Azure-Diensten**
