@@ -1,70 +1,167 @@
-# Getting Started with Create React App
+# Azure GenAI Chat – Deployment-Dokumentation
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## 1. Architekturübersicht
 
-## Available Scripts
+Die Anwendung besteht aus:
 
-In the project directory, you can run:
+* **Frontend:** React (Azure Static Web App)
+* **Backend:** FastAPI (Azure Container Instance oder App Service, basierend auf Docker-Image)
+* **Speicher:** Azure Storage Account (File Share für Zertifikate und Logs)
+* **Netzwerkzugriff:** Azure Application Gateway als Reverse Proxy mit SSL/TLS
+* **Zertifikat:** .pfx-Datei für HTTPS-Terminierung im Gateway
 
-### `npm start`
+---
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## 2. Voraussetzungen
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+* Azure CLI installiert und angemeldet
+* Ressourcengruppe vorhanden: `AzureGenAIChat-RG`
+* Storage Account: `azuregenaichatstorage`
+* Docker-Image des Backends im Azure Container Registry oder auf Docker Hub
 
-### `npm test`
+---
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## 3. Schritte zur Bereitstellung
 
-### `npm run build`
+### Schritt 1: Erstellen des Storage Accounts und Hochladen des Zertifikats
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+```bash
+az storage account create \
+  --name azuregenaichatstorage \
+  --resource-group AzureGenAIChat-RG \
+  --location westeurope
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+export STORAGE_KEY=$(az storage account keys list \
+  --resource-group AzureGenAIChat-RG \
+  --account-name azuregenaichatstorage \
+  --query "[0].value" -o tsv)
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+az storage share create --name reverseproxycerts \
+  --account-name azuregenaichatstorage \
+  --account-key $STORAGE_KEY
 
-### `npm run eject`
+az storage file upload \
+  --share-name reverseproxycerts \
+  --source /reverse-proxy.pfx \
+  --path reverse-proxy.pfx \
+  --account-name azuregenaichatstorage \
+  --account-key $STORAGE_KEY
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+---
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### Schritt 2: Container Backend bereitstellen
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+Falls das Backend lokal als Container getestet wurde:
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+```bash
+az container create \
+  --name azure-genai-chat-aci \
+  --resource-group AzureGenAIChat-RG \
+  --image docker.io/<dein-image>:latest \
+  --dns-name-label azure-genai-chat \
+  --ports 8000
+```
 
-## Learn More
+Nach erfolgreicher Bereitstellung prüfen:
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+```bash
+az container show \
+  --name azure-genai-chat-aci \
+  --resource-group AzureGenAIChat-RG \
+  --query ipAddress.fqdn -o tsv
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+Dieser FQDN wird im Application Gateway als Backendziel eingetragen.
 
-### Code Splitting
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+### Schritt 3: Application Gateway erstellen
 
-### Analyzing the Bundle Size
+```bash
+az network public-ip create \
+  --resource-group AzureGenAIChat-RG \
+  --name azure-genai-anwendungsgateway-pip \
+  --sku Standard
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+az network vnet create \
+  --resource-group AzureGenAIChat-RG \
+  --name azuregenai-vnet \
+  --subnet-name gateway-subnet
 
-### Making a Progressive Web App
+az network application-gateway create \
+  --name azure-genai-anwendungsgateway \
+  --location westeurope \
+  --resource-group AzureGenAIChat-RG \
+  --capacity 2 \
+  --sku Standard_v2 \
+  --vnet-name azuregenai-vnet \
+  --subnet gateway-subnet \
+  --frontend-port 443 \
+  --public-ip-address azure-genai-anwendungsgateway-pip
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+---
 
-### Advanced Configuration
+### Schritt 4: Zertifikat binden und Listener konfigurieren
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+In der Azure Console:
 
-### Deployment
+1. Application Gateway → Listener → **HTTPS (443)**
+2. Zertifikattyp: **PFX-Datei hochladen**
+3. Pfad: `/reverse-proxy.pfx`
+4. Kennwort: (aus `.env` oder lokalem Setup)
+5. Backendziel: FQDN des Container-Backends
+6. Backend-Port: 8000
+7. Regel hinzufügen: Weiterleitung 443 → 8000
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+---
 
-### `npm run build` fails to minify
+### Schritt 5: DNS-Eintrag
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Optional kann eine eigene Domain auf die öffentliche IP des Gateways zeigen:
+
+```bash
+4.182.80.132  →  app.deinedomain.de
+```
+
+---
+
+## 4. Fehlerbehebung
+
+### 502 Bad Gateway
+
+**Ursachen:**
+
+* Backend nicht erreichbar (Container nicht läuft oder falscher Port)
+* Backend-Health Probe im Gateway fehlerhaft
+* TLS-Mismatch (falsches Zertifikat)
+* Falscher FQDN oder Backendport in der Listenerregel
+
+**Lösung:**
+
+1. Container Logs prüfen:
+
+   ```bash
+   az container logs --name azure-genai-chat-aci --resource-group AzureGenAIChat-RG
+   ```
+2. Backend-Health in Application Gateway prüfen
+3. Health Probe auf HTTP statt HTTPS setzen (wenn Backend HTTP ist)
+4. Sicherstellen, dass Backend-Port = 8000 freigegeben ist
+
+---
+
+## 5. Überprüfung
+
+Nach erfolgreichem Setup:
+
+1. **Frontend (Static Web App)** → lädt über HTTPS von Application Gateway
+2. **Gateway-Logs** → zeigen 200-Statuscodes
+3. **Backend-Logs** → empfangen Requests korrekt
+4. Browserzugriff über:
+
+   ```
+   https://4.182.80.132
+   oder
+   https://app.deinedomain.de
+   ```
